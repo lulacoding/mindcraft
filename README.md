@@ -102,6 +102,34 @@ To connect to online servers your bot will need an official Microsoft/Minecraft 
 
 To use different accounts, Mindcraft will connect with the account that the Minecraft launcher is currently using. You can switch accounts in the launcher, then run `node main.js`, then switch to your main account after the bot has connected.
 
+## Connecting to Minecraft 1.21.10 (ViaProxy)
+Mindcraft is only tested up to Minecraft Java 1.21.6. To join a 1.21.10 world, run ViaProxy and point Mindcraft at it. Paste the following values in `settings.js` to force the protocol and proxy endpoint:
+
+```javascript
+"minecraft_version": "1.21.10",
+"host": "host.docker.internal", // or the ViaProxy host/IP
+"port": 25568,                   // ViaProxy listen port
+```
+
+If Mindcraft still reports an unsupported version, set `"allow_unsupported_versions": true` in `settings.js` so the version check is bypassed while ViaProxy handles protocol translation.
+
+Then start the proxy and configure its target server:
+
+```bash
+docker-compose --profile viaproxy up
+```
+
+The first run generates `services/viaproxy/viaproxy.yml`; edit `proxy.server.address` and `proxy.server.port` in that file to point to your 1.21.10 server/world. For online-mode servers, attach to the proxy container (e.g., `docker attach mindcraft-viaproxy-1`), add/select your Microsoft account with `account` commands, then detach with `CTRL-P` + `CTRL-Q` before launching Mindcraft.
+
+## Troubleshooting: missing `canvas.node` on Windows
+If you see `Cannot find module '../build/Release/canvas.node'` when starting the agent, the native Canvas dependency wasn't built. On Windows:
+
+1. Install [Visual Studio Build Tools](https://aka.ms/vs/17/release/vs_BuildTools.exe) with the "Desktop development with C++" workload and ensure Python 3.10+ is on your PATH.
+2. From this repo folder, rebuild canvas: `npm rebuild canvas --update-binary --build-from-source`.
+3. If it still fails, run `npm install canvas@^3.1.0 --build-from-source` after the prerequisites, then restart Mindcraft.
+
+These steps are only needed for the web viewer (`render_bot_view`). You can set `render_bot_view` to `false` in `settings.js` to skip Canvas entirely.
+
 ## Tasks
 
 Tasks automatically start the bot with a prompt and a goal item to aquire or blueprint to construct. To run a simple task that involves collecting 4 oak_logs run 

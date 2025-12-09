@@ -45,7 +45,7 @@ export async function createAgent(settings) {
 
     try {
         try {
-            const server = await getServer(settings.host, settings.port, settings.minecraft_version);
+            const server = await getServer(settings.host, settings.port, settings.minecraft_version, { allowUnsupportedVersions: settings.allow_unsupported_versions });
             settings.host = server.host;
             settings.port = server.port;
             settings.minecraft_version = server.version;
