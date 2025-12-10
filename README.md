@@ -44,6 +44,22 @@ Do not connect this bot to public servers with coding enabled. This project allo
 
 6. Run `node main.js` from the installed directory
 
+### Quick start command recap
+```bash
+# 1) install deps
+npm install
+
+# 2) launch Mindcraft (expects your LAN world at localhost:55916)
+node main.js
+```
+
+If you are connecting through ViaProxy for 1.21.10, add the following to `settings.js` before running:
+
+```javascript
+"minecraft_version": "1.21.10",
+"allow_unsupported_versions": true,
+```
+
 If you encounter issues, check the [FAQ](https://github.com/mindcraft-bots/mindcraft/blob/main/FAQ.md) or find support on [discord](https://discord.gg/mp73p35dzC). We are currently not very responsive to github issues. To run tasks please refer to [Minecollab Instructions](minecollab.md#installation)
 
 
