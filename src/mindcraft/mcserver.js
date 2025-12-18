@@ -108,7 +108,8 @@ export async function findServers(ip, earlyExit = false, timeout = 100) {
  * @param {string} version - The version to search for.
  * @returns {Promise<Object>} - A Promise that resolves to the server info object.
  */
-export async function getServer(host, port, version) {
+export async function getServer(host, port, version, options = {}) {
+    const { allowUnsupportedVersions = false } = options;
     let server = null;
     let serverString = "";
     let serverVersion = "";
@@ -140,11 +141,16 @@ export async function getServer(host, port, version) {
     else
         serverVersion = version;
     // Server version unsupported / mismatch
-    const isSupported = mc.supportedVersions.some(v => 
+    const isSupported = mc.supportedVersions.some(v =>
         serverVersion === v || (serverVersion.startsWith(v) && serverVersion.charAt(v.length) === '.')
     ); // Checks version or parent version (e.g. if 1.7 is supported then 1.7.2 will be allowed)
-     if (!isSupported)
-        throw new Error(`MC server was found ${serverString}, but version is unsupported. Supported versions are: ${mc.supportedVersions.join(", ")}.`);
+    if (!isSupported) {
+        const unsupportedMessage = `MC server was found ${serverString}, but version is unsupported. Supported versions are: ${mc.supportedVersions.join(", ")}.`;
+        if (!allowUnsupportedVersions) {
+            throw new Error(`${unsupportedMessage} If you're targeting a newer server, start ViaProxy (see README) or set allow_unsupported_versions in settings.js to force a connection.`);
+        }
+        console.warn(`${unsupportedMessage} Attempting connection anyway because allow_unsupported_versions=true.`);
+    }
     else if (version !== "auto" && server.version !== version)
         throw new Error(`MC server was found ${serverString}, but version is incorrect. Expected ${version}, but found ${server.version}. Check the server version in settings.js.`);
     else
